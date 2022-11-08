@@ -9,8 +9,12 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 late MqttServerClient client;
 
 Future<MqttServerClient> prepareMqttClient() async {
-  String? deviceId = await PlatformDeviceId.getDeviceId;
+  // todo Get device unique id
+  // String? deviceId = await PlatformDeviceId.getDeviceId;
+  String? deviceId = "Vincent";
+
   print(deviceId);
+
   client = MqttServerClient.withPort(
       "ceb1d69ea6904c50836dc3ce8214c321.s1.eu.hivemq.cloud",
       'flutter_client/$deviceId',

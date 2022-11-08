@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../main.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen(this.attemptMqttLogin, {Key? key}) : super(key: key);
+  final Function attemptMqttLogin;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -79,50 +81,52 @@ class _AuthScreenState extends State<AuthScreen> {
                       height: cons.maxHeight * 0.2,
                       child: Center(
                         child: Text(
-                          "APPLICATION TITLE",
+                          MyApp.appTitle,
                           style:
                               Theme.of(context).textTheme.titleLarge!.copyWith(
                                     color: Colors.white,
                                     fontSize: 25.0,
-                                    letterSpacing: 3.0,
+                                    letterSpacing: 5.0,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                         ),
                       ),
                     ),
                     SizedBox(
-                      height: cons.maxHeight*0.5,
-                    child: SingleChildScrollView(
-
-                      child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(children: [
-                          _textFormField(
-                              hintText: "Username",
-                              labelText: "Enter your name",
-                              icon: Icons.person),
-                          const SizedBox(height: 30),
-                          _textFormField(
-                              hintText: "Password",
-                              labelText: "Enter your password",
-                              icon: Icons.lock),
-                          const SizedBox(height: 30),],),
-                        ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(150, 75),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
+                      height: cons.maxHeight * 0.5,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              children: [
+                                _textFormField(
+                                    hintText: "Username",
+                                    labelText: "Enter your name",
+                                    icon: Icons.person),
+                                const SizedBox(height: 30),
+                                _textFormField(
+                                    hintText: "Password",
+                                    labelText: "Enter your password",
+                                    icon: Icons.lock),
+                                const SizedBox(height: 30),
+                              ],
                             ),
-                            onPressed: () {
-                              print("Attepmting Login");
-
-                            },
-                            child: Text("Login"))
-                      ],
+                            ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  fixedSize: const Size(150, 75),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () async{
+                                await  widget.attemptMqttLogin();
+                                  print("Attepmting Login");
+                                },
+                                child: const Text("Login"))
+                          ],
+                        ),
                       ),
-                    ),
                     ),
                   ],
                 );
