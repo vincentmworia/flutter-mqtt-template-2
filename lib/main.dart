@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './screens/auth_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -7,14 +9,14 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static const appTitle = 'IOT TEMPLATE';
-  static const _appPrimaryColor = Color(0xff4169e1);
-  static const _appSecondaryColor = Color(0xfa3EB489);
+  static const _appTitle = 'MQTT TEST';
+  static const _appPrimaryColor = Color(0xff002E63);//BLUE COOL BLACK
+  static const _appSecondaryColor = Color(0xffb16002);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: appTitle,
+      title: _appTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch()
@@ -27,24 +29,9 @@ class MyApp extends StatelessWidget {
               .textTheme
               .titleLarge!
               .copyWith(color: Colors.white, fontSize: 25.0, letterSpacing: 5.0),
-        ).copyWith(iconTheme: const IconThemeData(size: 30.0)),
+        ).copyWith(iconTheme: const IconThemeData(size: 30.0),),
       ),
-      home: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("TITLE"),
-          ),
-          body: Center(
-            child: Text(
-              "WELCOME",
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Theme.of(context).colorScheme.secondary),
-            ),
-          ),
-        ),
-      ),
+      home: const AuthScreen(),
     );
   }
 }
