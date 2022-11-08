@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mqtt_template_2/screens/home_screen.dart';
 import '../../main.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -40,6 +41,20 @@ class _AuthScreenState extends State<AuthScreen> {
           enabledBorder: _outlinedInputBorder(Colors.grey),
         ),
       );
+  var _isLoggingIn = false;
+
+  Future<void> _attemptLogin() async {
+    setState(() {
+      _isLoggingIn = true;
+    });
+    await widget.attemptMqttLogin();
+
+    setState(() {
+      _isLoggingIn = false;
+    });
+    Future.delayed(Duration.zero).then((value) => Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => const HomeScreen())));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -109,20 +124,17 @@ class _AuthScreenState extends State<AuthScreen> {
                                     hintText: "Password",
                                     labelText: "Enter your password",
                                     icon: Icons.lock),
-                                const SizedBox(height: 30),
+                                const SizedBox(height: 50),
                               ],
                             ),
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  fixedSize: const Size(150, 75),
+                                  fixedSize: const Size(200, 85),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
-                                onPressed: () async{
-                                await  widget.attemptMqttLogin();
-                                  print("Attepmting Login");
-                                },
+                                onPressed: _isLoggingIn ? null : _attemptLogin,
                                 child: const Text("Login"))
                           ],
                         ),
