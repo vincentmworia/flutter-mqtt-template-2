@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mqtt_template_2/screens/home_screen.dart';
+
+import '../screens/home_screen.dart';
 import '../../main.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen(this.attemptMqttLogin, {Key? key}) : super(key: key);
   final Function attemptMqttLogin;
 
+  static const routeName = '/auth_screen';
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -49,11 +51,11 @@ class _AuthScreenState extends State<AuthScreen> {
     });
     await widget.attemptMqttLogin();
 
-    setState(() {
-      _isLoggingIn = false;
-    });
-    Future.delayed(Duration.zero).then((value) => Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => const HomeScreen())));
+    // setState(() {
+    //   _isLoggingIn = false;
+    // });
+    Future.delayed(Duration.zero).then((value) =>
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName));
   }
 
   @override

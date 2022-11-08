@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -13,7 +12,7 @@ Future<MqttServerClient> prepareMqttClient() async {
   // String? deviceId = await PlatformDeviceId.getDeviceId;
   String? deviceId = "Vincent";
 
-  print(deviceId);
+  // print(deviceId);
 
   client = MqttServerClient.withPort(
       "ceb1d69ea6904c50836dc3ce8214c321.s1.eu.hivemq.cloud",
@@ -51,7 +50,20 @@ Future<MqttServerClient> prepareMqttClient() async {
 
   try {
     print("Connecting");
-    await client.connect();
+    await client.connect().then((_) {
+      client.subscribe('plc/#', MqttQos.atMostOnce);
+
+      client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+        final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+        final message =
+            MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+        // print(message);
+
+        MqttProvider().setScreenOneData(message);
+
+        if (c[0].topic == 'plc/screen_one') {}
+      });
+    });
   } catch (e) {
     if (kDebugMode) {
       print('\n\nException: $e');
@@ -104,4 +116,20 @@ void pong() {
   if (kDebugMode) {
     print('Ping response client callback invoked');
   }
+}
+
+// todo subscribe to all mqtt channels
+class MqttProvider with ChangeNotifier {
+  MqttServerClient? _mqttClient;
+  String? _screenOneData;
+
+  MqttServerClient? get mqttClient => _mqttClient;
+
+  void setScreenOneData(String data) {
+    _screenOneData = data;
+    print(data);
+    notifyListeners();
+  }
+
+  String get screenOneData => _screenOneData ?? "....";
 }
