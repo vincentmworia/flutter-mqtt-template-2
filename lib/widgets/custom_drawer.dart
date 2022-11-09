@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mqtt_template_2/helpers/mqtt.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/auth_screen.dart';
 
@@ -36,7 +38,11 @@ class CustomDrawer extends StatelessWidget {
                 title: "Logout",
                 onTap: () {
                   print("Logout");
-                  Navigator.pushReplacementNamed(context, AuthScreen.routeName)  ;
+                  // client.unsubscribe('cbes/heatingunit/#');
+                  Provider.of<MqttProvider>(context, listen: false)
+                      .mqttClient
+                      .disconnect();
+                  Navigator.pushReplacementNamed(context, AuthScreen.routeName);
                 }),
           )
         ],

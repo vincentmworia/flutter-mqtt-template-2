@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:mqtt_template_2/helpers/mqtt.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/home_screen.dart';
 import '../../main.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen(this.attemptMqttLogin, {Key? key}) : super(key: key);
-  final Function attemptMqttLogin;
+  const AuthScreen(/*this.attemptMqttLogin,*/ {Key? key}) : super(key: key);
+
+  // final Function attemptMqttLogin;
 
   static const routeName = '/auth_screen';
+
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -49,11 +53,27 @@ class _AuthScreenState extends State<AuthScreen> {
     setState(() {
       _isLoggingIn = true;
     });
-    await widget.attemptMqttLogin();
+    final connectionStatus =
+        await Provider.of<MqttProvider>(context, listen: false)
+            .initializeMqttClient();
+    switch (connectionStatus) {
+      case ConnectionStatus.disconnected:
+        Future.delayed(Duration.zero).then((value) {
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Disconnected")));
+        });
+        break;
+      case ConnectionStatus.connected:
+        Future.delayed(Duration.zero).then((value) {
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Connected"),duration:  Duration(seconds: 2),));
+        }).then((value) =>
+            Navigator.pushReplacementNamed(context, HomeScreen.routeName));
+        break;
+    }
 
-    // setState(() {
-    //   _isLoggingIn = false;
-    // });
     Future.delayed(Duration.zero).then((value) =>
         Navigator.pushReplacementNamed(context, HomeScreen.routeName));
   }

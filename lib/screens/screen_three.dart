@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../helpers/mqtt.dart';
 
 class ScreenThree extends StatelessWidget {
   const ScreenThree({Key? key}) : super(key: key);
@@ -13,11 +16,12 @@ class ScreenThree extends StatelessWidget {
       ),
       // drawer: const CustomDrawer(),
       body: Center(
-        child: Text(
-          "Screen Three",
-          style: Theme.of(context).textTheme.bodyText1,
-        ),
-      ),
+          child: Consumer<MqttProvider>(
+            builder: (context, mqttProv, child) => Text(
+              mqttProv.screenThreeData,
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          )),
     ));
   }
 }
