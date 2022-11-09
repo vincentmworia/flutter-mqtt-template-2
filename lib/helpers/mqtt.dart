@@ -58,7 +58,7 @@ class MqttProvider with ChangeNotifier {
 
     final connMessage = MqttConnectMessage()
         .authenticateAs('Vincent', 'mycluster')
-        .withWillTopic('will/$deviceId')
+        .withWillTopic('will/phone/$deviceId')
         .withWillMessage('$deviceId disconnected')
         // .withWillRetain()
         .startClean()
@@ -72,7 +72,7 @@ class MqttProvider with ChangeNotifier {
       if (kDebugMode) {
         print("Connecting");
       }
-      await _mqttClient.connect();
+     final ok= await _mqttClient.connect();
       connectionStatus = ConnectionStatus.connected;
     } catch (e) {
       if (kDebugMode) {
@@ -126,6 +126,7 @@ class MqttProvider with ChangeNotifier {
   void onDisconnected() {
     if (kDebugMode) {
       print('Disconnected');
+      // TODO ON DISCONNECTED, FORCE THE USER OFFLINE
     }
   }
 

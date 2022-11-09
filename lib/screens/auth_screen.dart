@@ -10,6 +10,24 @@ class AuthScreen extends StatefulWidget {
 
   static const routeName = '/auth_screen';
 
+  static Widget background(
+          BuildContext context, double deviceHeight, Widget? child,
+          [double opValue = 0.95]) =>
+      Container(
+        width: double.infinity,
+        height: deviceHeight,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).colorScheme.primary.withOpacity(opValue),
+              Theme.of(context).colorScheme.secondary.withOpacity(opValue),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+      );
+
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
@@ -79,28 +97,15 @@ class _AuthScreenState extends State<AuthScreen> {
         Navigator.pushReplacementNamed(context, HomeScreen.routeName));
   }
 
+  static const opValue = 0.75;
+
   @override
   Widget build(BuildContext context) {
-    final deviceHeight =
-        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
+    final deviceHeight = MediaQuery.of(context).size.height;
+    // - MediaQuery.of(context).padding.top;
     final deviceWidth = MediaQuery.of(context).size.width;
-    const opValue = 0.75;
-    final background = Container(
-      width: double.infinity,
-      height: deviceHeight,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(opValue),
-            Theme.of(context).colorScheme.secondary.withOpacity(opValue),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-    );
-    return SafeArea(
-        child: Scaffold(
+
+    return Scaffold(
       backgroundColor:
           Theme.of(context).colorScheme.primary.withOpacity(opValue * 0.5),
       body: SingleChildScrollView(
@@ -108,7 +113,7 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            background,
+            AuthScreen.background(context, deviceHeight, null, opValue),
             SizedBox(
               height: deviceHeight,
               child: Padding(
@@ -119,13 +124,15 @@ class _AuthScreenState extends State<AuthScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
+                        SizedBox(height: cons.maxHeight * 0.05),
                         Container(
-                          height: cons.maxHeight * 0.25,
-                  width: cons.maxHeight * 0.25,
+                          // padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+
+                          height: cons.maxHeight * 0.2,
+                          width: cons.maxHeight * 0.2,
                           decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle
-                          ),
+                              color: Colors.white, shape: BoxShape.circle),
+
                           child: Image.asset('images/logo.PNG'),
                         ),
                         SizedBox(
@@ -179,6 +186,6 @@ class _AuthScreenState extends State<AuthScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
