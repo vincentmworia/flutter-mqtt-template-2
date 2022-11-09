@@ -8,8 +8,6 @@ import '../../main.dart';
 class AuthScreen extends StatefulWidget {
   const AuthScreen(/*this.attemptMqttLogin,*/ {Key? key}) : super(key: key);
 
-  // final Function attemptMqttLogin;
-
   static const routeName = '/auth_screen';
 
   @override
@@ -24,7 +22,7 @@ class _AuthScreenState extends State<AuthScreen> {
         gapPadding: 4.0,
         borderSide: BorderSide(
           color: color,
-          width: 1.0,
+          width: 2.0,
         ),
       );
 
@@ -40,6 +38,7 @@ class _AuthScreenState extends State<AuthScreen> {
           prefixIcon: Icon(icon),
           hintText: hintText,
           // labelText: labelText,
+
           // TODO PRESSED
           focusedBorder:
               _outlinedInputBorder(Theme.of(context).colorScheme.primary),
@@ -67,8 +66,10 @@ class _AuthScreenState extends State<AuthScreen> {
       case ConnectionStatus.connected:
         Future.delayed(Duration.zero).then((value) {
           ScaffoldMessenger.of(context).removeCurrentSnackBar();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(const SnackBar(content: Text("Connected"),duration:  Duration(seconds: 2),));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Connected"),
+            duration: Duration(seconds: 2),
+          ));
         }).then((value) =>
             Navigator.pushReplacementNamed(context, HomeScreen.routeName));
         break;
@@ -101,73 +102,82 @@ class _AuthScreenState extends State<AuthScreen> {
     return SafeArea(
         child: Scaffold(
       backgroundColor:
-          Theme.of(context).colorScheme.primary.withOpacity(opValue),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          background,
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Form(
-              key: _formKey,
-              child: LayoutBuilder(builder: (context, cons) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    SizedBox(
-                      height: cons.maxHeight * 0.2,
-                      child: Center(
-                        child: Text(
-                          MyApp.appTitle,
-                          style:
-                              Theme.of(context).textTheme.titleLarge!.copyWith(
-                                    color: Colors.white,
-                                    fontSize: 25.0,
-                                    letterSpacing: 5.0,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+          Theme.of(context).colorScheme.primary.withOpacity(opValue * 0.5),
+      body: SingleChildScrollView(
+        // physics: const BouncingScrollPhysics(),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            background,
+            SizedBox(
+              height: deviceHeight,
+              child: Padding(
+                padding: const EdgeInsets.all(25.0),
+                child: Form(
+                  key: _formKey,
+                  child: LayoutBuilder(builder: (context, cons) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Container(
+                          height: cons.maxHeight * 0.25,
+                  width: cons.maxHeight * 0.25,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle
+                          ),
+                          child: Image.asset('images/logo.PNG'),
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: cons.maxHeight * 0.5,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              children: [
-                                _textFormField(
-                                    hintText: "Username",
-                                    labelText: "Enter your name",
-                                    icon: Icons.person),
-                                const SizedBox(height: 30),
-                                _textFormField(
-                                    hintText: "Password",
-                                    labelText: "Enter your password",
-                                    icon: Icons.lock),
-                                const SizedBox(height: 50),
-                              ],
-                            ),
-                            ElevatedButton(
+                        SizedBox(
+                          height: cons.maxHeight * 0.6,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _textFormField(
+                                  hintText: "Username",
+                                  labelText: "Enter your name",
+                                  icon: Icons.person),
+                              const SizedBox(height: 30),
+                              _textFormField(
+                                  hintText: "Password",
+                                  labelText: "Enter your password",
+                                  icon: Icons.lock),
+                              const SizedBox(height: 50),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: cons.maxHeight * 0.15,
+                          child: Center(
+                            child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  fixedSize: const Size(200, 85),
+                                  fixedSize: const Size(200, 75),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                 ),
                                 onPressed: _isLoggingIn ? null : _attemptLogin,
-                                child: const Text("Login"))
-                          ],
+                                child: Text(
+                                  "Login",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyText1!
+                                      .copyWith(
+                                        color: Colors.white,
+                                        letterSpacing: 5.0,
+                                        fontSize: 20,
+                                      ),
+                                )),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-          )
-        ],
+                      ],
+                    );
+                  }),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     ));
   }

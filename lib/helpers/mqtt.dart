@@ -30,7 +30,7 @@ class MqttProvider with ChangeNotifier {
     var connectionStatus = ConnectionStatus.disconnected;
     // todo Get device unique id
     // String? deviceId = await PlatformDeviceId.getDeviceId;
-    String? deviceId = "Vincent";
+    String? deviceId = "Phone";
 
     // print(deviceId);
 

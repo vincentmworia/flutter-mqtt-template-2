@@ -24,10 +24,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // late MqttServerClient mqttClient;
-
-  // Future<void> _attemptMqttLogin() async => await prepareMqttClient();
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -49,7 +45,7 @@ class _MyAppState extends State<MyApp> {
             iconTheme: const IconThemeData(size: 30.0, color: Colors.white),
           ),
         ),
-        home: const AuthScreen( ),
+        home: const AuthScreen(),
         routes: {
           HomeScreen.routeName: (_) => const HomeScreen(),
           ScreenOne.routeName: (_) => const ScreenOne(),
@@ -57,10 +53,10 @@ class _MyAppState extends State<MyApp> {
           ScreenThree.routeName: (_) => const ScreenThree(),
         },
         onGenerateRoute: (settings) => MaterialPageRoute(
-          builder: (_) => const AuthScreen( ),
+          builder: (_) => const AuthScreen(),
         ),
         onUnknownRoute: (settings) => MaterialPageRoute(
-          builder: (_) => const AuthScreen( ),
+          builder: (_) => const AuthScreen(),
         ),
       ),
     );
