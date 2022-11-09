@@ -1,6 +1,6 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:internet_connectivity_checker/internet_connectivity_checker.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import './screens/home_screen.dart';
@@ -28,123 +28,76 @@ class MyApp extends StatefulWidget {
 enum InternetStatus { online, offline, loading }
 
 class _MyAppState extends State<MyApp> {
-  var _internetStatus = InternetStatus.loading;
+  var _internetStatus = InternetStatus.offline;
+  final _connectivity = Connectivity();
+
+  @override
+  void initState() {
+    super.initState();
+    print("CHANGED DEPENDENCIES");
+    _connectivity.onConnectivityChanged.listen((event) {
+      print(event);
+      if (event == ConnectivityResult.none) {
+        setState(() {
+          print("offline");
+          _internetStatus = InternetStatus.offline;
+        });
+      } else {
+        print("online");
+        setState(() {
+          _internetStatus = InternetStatus.online;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (_) => MqttProvider(),
-        child: StreamBuilder(
-          stream: InternetConnectivity().isConnectedToInternet(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData && (snapshot.data as bool) == true) {
-              _internetStatus = InternetStatus.online;
-              // print("online");
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              _internetStatus = InternetStatus.loading;
-              // print("loading");
-            } else {
-              _internetStatus = InternetStatus.offline;
-              // print("offline");
-            }
-            switch (_internetStatus) {
-              case InternetStatus.online:
-                return MaterialApp(
-                  title: MyApp.appTitle,
-                  debugShowCheckedModeBanner: false,
-                  theme: ThemeData(
-                    colorScheme: ColorScheme.fromSwatch().copyWith(
-                        primary: MyApp._appPrimaryColor,
-                        secondary: MyApp._appSecondaryColor),
-                    appBarTheme: AppBarTheme(
-                      toolbarHeight: 70,
-                      centerTitle: true,
-                      elevation: 0,
-                      titleTextStyle: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(
-                              color: Colors.white,
-                              fontSize: 25.0,
-                              letterSpacing: 5.0),
-                    ).copyWith(
-                      iconTheme:
-                          const IconThemeData(size: 30.0, color: Colors.white),
-                    ),
+        child: MaterialApp(
+          title: MyApp.appTitle,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: MyApp._appPrimaryColor,
+                secondary: MyApp._appSecondaryColor),
+            appBarTheme: AppBarTheme(
+              toolbarHeight: 70,
+              centerTitle: true,
+              elevation: 0,
+              titleTextStyle: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  color: Colors.white, fontSize: 25.0, letterSpacing: 5.0),
+            ).copyWith(
+              iconTheme: const IconThemeData(size: 30.0, color: Colors.white),
+            ),
+          ),
+          home: _internetStatus == InternetStatus.loading
+              ? const Scaffold(
+                  body: Center(
+                    child: SpinKitRipple(
+                        size: double.infinity, color: Colors.green),
                   ),
-                  home: const AuthScreen(),
-                  routes: {
-                    HomeScreen.routeName: (_) => const HomeScreen(),
-                    ScreenOne.routeName: (_) => const ScreenOne(),
-                    ScreenTwo.routeName: (_) => const ScreenTwo(),
-                    ScreenThree.routeName: (_) => const ScreenThree(),
-                  },
-                  onGenerateRoute: (settings) => MaterialPageRoute(
-                    builder: (_) => const AuthScreen(),
-                  ),
-                  onUnknownRoute: (settings) => MaterialPageRoute(
-                    builder: (_) => const AuthScreen(),
-                  ),
-                );
-              case InternetStatus.offline:
-                return MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  home: SafeArea(
-                    child: Scaffold(
-                      backgroundColor: Colors.white54,
-                      body: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              MyApp._appPrimaryColor.withOpacity(0.95),
-                              MyApp._appSecondaryColor.withOpacity(0.95),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "OFFLINE",
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline2!
-                                .copyWith(
-                                    color: Colors.white, letterSpacing: 3.0),
-                          ),
-                        ),
+                )
+              : _internetStatus == InternetStatus.online
+                  ? const AuthScreen()
+                  : const Scaffold(
+                      body: Center(
+                        child: Text("OFFLINE"),
                       ),
                     ),
-                  ),
-                );
-              case InternetStatus.loading:
-                return MaterialApp(debugShowCheckedModeBanner: false,
-                  home: SafeArea(
-                    child: Scaffold(
-                      backgroundColor: Colors.white54,
-                      body: Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              MyApp._appPrimaryColor.withOpacity(0.95),
-                              MyApp._appSecondaryColor.withOpacity(0.95),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: const SpinKitRipple(
-                            size: double.infinity, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                );
-            }
+          routes: {
+            HomeScreen.routeName: (_) => const HomeScreen(),
+            ScreenOne.routeName: (_) => const ScreenOne(),
+            ScreenTwo.routeName: (_) => const ScreenTwo(),
+            ScreenThree.routeName: (_) => const ScreenThree(),
           },
+          onGenerateRoute: (settings) => MaterialPageRoute(
+            builder: (_) => const AuthScreen(),
+          ),
+          onUnknownRoute: (settings) => MaterialPageRoute(
+            builder: (_) => const AuthScreen(),
+          ),
         ));
   }
 }

@@ -15,6 +15,7 @@ class MqttProvider with ChangeNotifier {
   // MqttServerClient? _mqttClient;
   late MqttServerClient _mqttClient;
 
+
   MqttServerClient get mqttClient => _mqttClient;
 
   String get screenOneData => _screenOneData;
@@ -34,77 +35,84 @@ class MqttProvider with ChangeNotifier {
 
     // print(deviceId);
 
-    _mqttClient = MqttServerClient.withPort(
-        "ceb1d69ea6904c50836dc3ce8214c321.s1.eu.hivemq.cloud",
-        'flutter_client/$deviceId',
-        8883);
-    _mqttClient.secure = true;
-    _mqttClient.securityContext = SecurityContext.defaultContext;
-    _mqttClient.keepAlivePeriod = 20;
-    _mqttClient.onConnected = onConnected;
-    _mqttClient.onDisconnected = onDisconnected;
-    _mqttClient.onSubscribed = onSubscribed;
-    _mqttClient.onUnsubscribed = onUnsubscribed;
-    _mqttClient.onSubscribed = onSubscribed;
-    _mqttClient.onSubscribeFail = onSubscribeFail;
-    _mqttClient.pongCallback = pong;
+    try{
 
-    _mqttClient.keepAlivePeriod = 60;
-    // client.autoReconnect = true;
-    /*SecurityContext context = SecurityContext()
+      _mqttClient = MqttServerClient.withPort(
+          "ceb1d69ea6904c50836dc3ce8214c321.s1.eu.hivemq.cloud",
+          'flutter_client/$deviceId',
+          8883);
+      _mqttClient.secure = true;
+      _mqttClient.securityContext = SecurityContext.defaultContext;
+      _mqttClient.keepAlivePeriod = 20;
+      _mqttClient.onConnected = onConnected;
+      _mqttClient.onDisconnected = onDisconnected;
+      _mqttClient.onSubscribed = onSubscribed;
+      _mqttClient.onUnsubscribed = onUnsubscribed;
+      _mqttClient.onSubscribed = onSubscribed;
+      _mqttClient.onSubscribeFail = onSubscribeFail;
+      _mqttClient.pongCallback = pong;
+
+      _mqttClient.keepAlivePeriod = 60;
+      // client.autoReconnect = true;
+      /*SecurityContext context = SecurityContext()
     ..useCertificateChain('path/to/my_cert.pem')
     ..usePrivateKey('path/to/my_key.pem', password: 'key_password')
     ..setClientAuthorities('path/to/client.crt', password: 'password');*/
 
-    final connMessage = MqttConnectMessage()
-        .authenticateAs('Vincent', 'mycluster')
-        .withWillTopic('will/phone/$deviceId')
-        .withWillMessage('$deviceId disconnected')
-        // .withWillRetain()
-        .startClean()
-        .withWillQos(MqttQos.exactlyOnce);
-    _mqttClient.connectionMessage = connMessage;
+      final connMessage = MqttConnectMessage()
+          .authenticateAs('Vincent', 'mycluster')
+          .withWillTopic('will/phone/$deviceId')
+          .withWillMessage('$deviceId disconnected')
+      // .withWillRetain()
+          .startClean()
+          .withWillQos(MqttQos.exactlyOnce);
+      _mqttClient.connectionMessage = connMessage;
 
-    _mqttClient.secure = true;
-    _mqttClient.securityContext = SecurityContext.defaultContext;
+      _mqttClient.secure = true;
+      _mqttClient.securityContext = SecurityContext.defaultContext;
 
-    try {
-      if (kDebugMode) {
-        print("Connecting");
+      try {
+        if (kDebugMode) {
+          print("Connecting");
+        }
+        final ok= await _mqttClient.connect();
+        connectionStatus = ConnectionStatus.connected;
+      } catch (e) {
+        if (kDebugMode) {
+          print('\n\nException: $e');
+        }
+        _mqttClient.disconnect();
+        connectionStatus = ConnectionStatus.disconnected;
       }
-     final ok= await _mqttClient.connect();
-      connectionStatus = ConnectionStatus.connected;
-    } catch (e) {
-      if (kDebugMode) {
-        print('\n\nException: $e');
+      if (connectionStatus == ConnectionStatus.connected) {
+        _mqttClient.subscribe("cbes/dekut/#", MqttQos.exactlyOnce);
+
+        _mqttClient.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+          final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+          final topic = c[0].topic;
+          print(topic);
+          final message =
+          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+
+          final topicBreakdown = topic.split('/');
+          if (topicBreakdown[3] == "tank1") {
+            _screenOneData = message;
+          }
+          if (topicBreakdown[3] == "tank2") {
+            _screenTwoData = message;
+          }
+          if (topicBreakdown[3] == "tank3") {
+            _screenThreeData = message;
+          }
+          print(message);
+          notifyListeners();
+        });
       }
-      _mqttClient.disconnect();
-      connectionStatus = ConnectionStatus.disconnected;
+
     }
-    if (connectionStatus == ConnectionStatus.connected) {
-      _mqttClient.subscribe("cbes/dekut/#", MqttQos.exactlyOnce);
-
-      _mqttClient.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
-        final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
-        final topic = c[0].topic;
-        print(topic);
-        final message =
-            MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-
-        final topicBreakdown = topic.split('/');
-        if (topicBreakdown[3] == "tank1") {
-          _screenOneData = message;
-        }
-        if (topicBreakdown[3] == "tank2") {
-          _screenTwoData = message;
-        }
-        if (topicBreakdown[3] == "tank3") {
-          _screenThreeData = message;
-        }
-        notifyListeners();
-      });
+    catch (e){
+      print("ERROR DETECTED");
     }
-
     return connectionStatus;
   }
 

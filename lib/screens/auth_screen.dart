@@ -125,15 +125,12 @@ class _AuthScreenState extends State<AuthScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         SizedBox(height: cons.maxHeight * 0.05),
-                        Container(
-                          // padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-
+                        SizedBox(
                           height: cons.maxHeight * 0.2,
-                          width: cons.maxHeight * 0.2,
-                          decoration: const BoxDecoration(
-                              color: Colors.white, shape: BoxShape.circle),
-
-                          child: Image.asset('images/logo.PNG'),
+                          child: Image.asset(
+                            'images/logo.PNG', fit: BoxFit.cover,
+                            // height: cons.maxHeight * 0.2,
+                          ),
                         ),
                         SizedBox(
                           height: cons.maxHeight * 0.6,
